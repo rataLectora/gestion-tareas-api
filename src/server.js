@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from "express";
 import healthRoutes from "./routes/health.routes.js"
 import authRoutes from  "./routes/auth.routes.js"
+import taskRoutes from  "./routes/task.routes.js"
 import pool from "./db/index.js";
 
 
@@ -13,6 +14,7 @@ app.use(express.json())
 
 app.use(healthRoutes)
 app.use("/api/auth", authRoutes)
+app.use("/api/task", taskRoutes)
 
 
 pool.query('SELECT NOW()', (err,res) =>{
