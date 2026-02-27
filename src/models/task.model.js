@@ -40,3 +40,28 @@ export const getTaskByUserId = async (userId)=>{
         throw error
     }
 }
+
+
+export const updateTask = async (taskId,userId,title,description,completed) =>{
+    const query = `
+    UPDATE tasks
+    SET title = COALESCE($1,title),
+        description = COALESCE($2,description),
+        completed = COALESCE ($3, completed)
+    WHERE id = $4 and user_id = $5
+    RETURNING *;     
+    `;
+
+    const values = [title,description,completed,taskId,userId]
+
+    try{
+        const result = await pool.query(query,values)
+
+        return result.rows[0]
+
+    }catch(error){
+
+        throw error
+
+    }
+}

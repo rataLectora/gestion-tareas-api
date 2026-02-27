@@ -1,4 +1,4 @@
-import {createTask,getTaskByUserId} from "../models/task.model.js";
+import {createTask,getTaskByUserId,updateTask} from "../models/task.model.js";
 
 export const createNewTask = async(req,res)=>{
     try{
@@ -43,4 +43,31 @@ export const getUserTasks = async (req,res) =>{
     res.status(500).json({message: "Error interno del servidor"})
 
   }
+}
+
+export const updateExistingTask = async (req,res) =>{
+    try{
+        const {id} = req.params
+
+        const {title,description,completed} = req.body
+
+        const userId = req.user.id
+
+        const updatedTask = await updateTask (id,userId,title,description,completed)
+
+        if(!updatedTask){
+            return res.status(404).json({
+                message: "Tarea no encontrada o no posees permisos para editarla"
+            })
+        }
+
+        return res.status(200).json({
+            message: "Tarea actualizada con éxito",
+            task: updatedTask
+        })
+    }catch(error){
+        console.log("Error al actualizar la tarea:",error)
+        res.status(500).json({message: "Error interno del servidor"})
+
+    }
 }
