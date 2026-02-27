@@ -1,4 +1,4 @@
-import {createTask} from "../models/task.model.js";
+import {createTask,getTaskByUserId} from "../models/task.model.js";
 
 export const createNewTask = async(req,res)=>{
     try{
@@ -26,4 +26,21 @@ export const createNewTask = async(req,res)=>{
     }
     
     
+}
+
+export const getUserTasks = async (req,res) =>{
+  try{
+    const userId = req.user.id
+
+    const tasks = await getTaskByUserId(userId)
+
+    res.status(200).json({
+        message: "Tareas obtenidas con éxito",
+        tasks:tasks
+    })
+  }catch(error){
+    console.log("Error al obtener las tareas: ", error)
+    res.status(500).json({message: "Error interno del servidor"})
+
+  }
 }

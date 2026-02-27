@@ -19,3 +19,24 @@ export const createTask = async (title, description,userId)=>{
 
     }
 }
+
+
+export const getTaskByUserId = async (userId)=>{
+    const query = `
+        SELECT * FROM tasks
+        WHERE user_id = $1
+        ORDER BY created_at DESC;
+        
+        `;
+    
+    const values = [userId]
+
+    try{
+        const result  = await pool.query(query,values)
+
+        return result.rows;
+
+    }catch(error){
+        throw error
+    }
+}
