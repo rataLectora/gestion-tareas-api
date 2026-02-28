@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from "express";
+import cors from "cors"
 import healthRoutes from "./routes/health.routes.js"
 import authRoutes from  "./routes/auth.routes.js"
 import taskRoutes from  "./routes/task.routes.js"
@@ -9,6 +10,8 @@ import pool from "./db/index.js";
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
+app.use(cors())
 
 app.use(express.json())
 
@@ -28,6 +31,4 @@ pool.query('SELECT NOW()', (err,res) =>{
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`)
 })
-
-
 
