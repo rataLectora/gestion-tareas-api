@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Mis Tareas - Gestor</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        /* Botones generales */
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 15px; color: white; font-size: 14px; }
+        .btn-logout { background-color: #dc3545; }
+        .btn-logout:hover { background-color: #c82333; }
+        .btn-add { background-color: #28a745; padding: 10px 20px; }
+        .btn-add:hover { background-color: #218838; }
+
+        /* Formulario superior */
+        .task-form { display: flex; gap: 10px; margin-bottom: 20px; }
+        .task-form input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        /* Lista de tareas */
+        .task-list { list-style: none; padding: 0; }
+        .task-item { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .task-info h3 { margin: 0 0 5px 0; font-size: 18px; }
+        .task-info p { margin: 0; color: #666; font-size: 14px; }
+    </style>
+    </head>
+    <body>
+        <div class="container">
+        <div class="header">
+            <h2>Gestor de Tareas</h2>
+            <button id="btnLogout" class="btn-logout">Cerrar Sesión</button>
+        </div>
+
+        <form id="taskForm" class="task-form">
+            <input type="text" id="taskTitle" placeholder="Nueva tarea..." required>
+            <input type="text" id="taskDesc" placeholder="Descripción (opcional)">
+            <button type="submit" class="btn-add">Agregar</button>
+        </form>
+
+        <ul id="taskList" class="task-list">
+            <li class="task-item">
+                <div class="task-info">
+                    <h3>Cargando tus tareas...</h3>
+                    <p>Conectando con la base de datos.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+        
+        
+       
+        
+        <script>
+
+            const token = localStorage.getItem("token")
+
+            if(!token){
+                alert("Acceso denegado, por favor incia sesión.")
+                window.location.href = "index.html"
+            }
+
+            const btnLogout = document.getElementById("btnLogout")
+            btnLogout.addEventListener("click", () =>{
+                localStorage.removeItem("token")
+                window.location.href = "index.html"
+            })
+
+            const taskList = document.getElementById("taskList")
+            const cargarTareas = async () =>{
+                try{
+                    const response = await fetch ('http://localhost:3000/api/task', {
+                        method: "GET",
+                        headers: {
+                            "authorization": `Bearer ${token}`
+                        }
+                    })
+
+                    const data = await response.json()
+
+                    if (response.ok){
+                        taskList.innerHTML=""
+
+                        if (data.tasks.length === 0){
+                            taskList.innerHTML = '<li class="task-item"><p>No tienes tareas pendientes. ¡Agrega una arriba!</p></li>';
+                            return
+                        }
+
+                        data.tasks.forEach(tarea => {
+                            const li = document.createElement("li")
+                            li.className = "task-item"
+                            li.innerHTML = `
+                                <div class="task-info">
+                                        <h3>${tarea.title}</h3>
+                                        <p>${tarea.description || 'Sin descripción'}</p>
+                                </div>
+                            `;
+                            taskList.appendChild(li)
+                        })
+                    }else{
+                       taskList.innerHTML = `<li class="task-item"><p style="color:red;">Error: ${data.message}</p></li>`
+                    }
+                }catch(error){
+                    console.error("Error de conexión:", error)
+                    taskList.innerHTML = '<li class="task-item"><p style="color:red;">Error al conectar con la base de datos.</p></li>'
+
+            cargarTareas()
+           
+        </script>
+    </body>
+</html>

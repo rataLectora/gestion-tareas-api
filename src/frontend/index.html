@@ -11,6 +11,8 @@
         button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
         button:hover { background-color: #218838; }
         #mensajeError { color: red; font-size: 14px; display: none; margin-top: 10px; }
+        .link-registro { display: block; text-align: center; margin-top: 15px; font-size: 14px; color: #555; text-decoration: none; }
+        .link-registro:hover { text-decoration: underline; }
     </style>
     
 </head>
@@ -24,6 +26,7 @@
             <button type="submit">Entrar</button>
             <p id="mensajeError">Credenciales incorrectas.</p>
         </form>
+    <a href="registro.html" class="link-registro">¿No tienes cuenta? Regístrate aquí</a>
     </div>
 
     <script>
@@ -51,8 +54,8 @@
                 localStorage.setItem("token",data.token)
 
                 mensajeError.style.display = "none"
+                window.location.href = "tareas.html"
 
-                alert('¡Login exitoso! Tu token está guardado de forma segura.')
             }else{
                 mensajeError.textContent = data.message || "Error al inciar sesion"
                 mensajeError.style.display = "block"
