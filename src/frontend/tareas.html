@@ -57,21 +57,23 @@
        
         
         <script>
-
-            const token = localStorage.getItem("token")
+            
+            const token = localStorage.getItem("token");
 
             if(!token){
-                alert("Acceso denegado, por favor incia sesión.")
-                window.location.href = "index.html"
+                alert("Acceso denegado, por favor inicia sesión.");
+                window.location.href = "index.html";
             }
 
-            const btnLogout = document.getElementById("btnLogout")
+            
+            const btnLogout = document.getElementById("btnLogout");
             btnLogout.addEventListener("click", () =>{
-                localStorage.removeItem("token")
-                window.location.href = "index.html"
-            })
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            });
 
-            const taskList = document.getElementById("taskList")
+          
+            const taskList = document.getElementById("taskList");
             const cargarTareas = async () =>{
                 try{
                     const response = await fetch ('http://localhost:3000/api/task', {
@@ -79,37 +81,74 @@
                         headers: {
                             "authorization": `Bearer ${token}`
                         }
-                    })
+                    });
 
-                    const data = await response.json()
+                    const data = await response.json();
 
                     if (response.ok){
-                        taskList.innerHTML=""
+                        taskList.innerHTML="";
 
                         if (data.tasks.length === 0){
                             taskList.innerHTML = '<li class="task-item"><p>No tienes tareas pendientes. ¡Agrega una arriba!</p></li>';
-                            return
+                            return;
                         }
 
                         data.tasks.forEach(tarea => {
-                            const li = document.createElement("li")
-                            li.className = "task-item"
+                            const li = document.createElement("li");
+                            li.className = "task-item";
                             li.innerHTML = `
                                 <div class="task-info">
                                         <h3>${tarea.title}</h3>
                                         <p>${tarea.description || 'Sin descripción'}</p>
                                 </div>
                             `;
-                            taskList.appendChild(li)
-                        })
+                            taskList.appendChild(li);
+                        });
                     }else{
-                       taskList.innerHTML = `<li class="task-item"><p style="color:red;">Error: ${data.message}</p></li>`
+                       taskList.innerHTML = `<li class="task-item"><p style="color:red;">Error: ${data.message}</p></li>`;
                     }
                 }catch(error){
-                    console.error("Error de conexión:", error)
-                    taskList.innerHTML = '<li class="task-item"><p style="color:red;">Error al conectar con la base de datos.</p></li>'
+                    console.error("Error de conexión:", error);
+                    taskList.innerHTML = '<li class="task-item"><p style="color:red;">Error al conectar con la base de datos.</p></li>';
+                } 
+            }; 
 
-            cargarTareas()
+            cargarTareas();
+
+
+            const taskForm = document.getElementById("taskForm");
+            
+            taskForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const title = document.getElementById("taskTitle").value;
+                const description = document.getElementById("taskDesc").value;
+
+                try{
+                    const response = await fetch ("http://localhost:3000/api/task",{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({title,description})
+                    });
+
+                    if (response.ok){
+                        document.getElementById("taskTitle").value = "";
+                        document.getElementById("taskDesc").value = "";
+
+                        cargarTareas();
+                    }else{
+                        const data = await response.json();
+                        alert("Error al guardar: " + data.message);
+                    }
+
+                }catch(error){
+                    console.error("Error al crear la tarea: ", error);
+                    alert("Error de conexion al intentar guardar la tarea");
+                }
+            }); 
            
         </script>
     </body>
