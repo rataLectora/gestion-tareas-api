@@ -79,6 +79,17 @@
                 </div>
             </div>
         </div>
+
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3>¿Eliminar Tarea?</h3>
+                <p>¿Estás seguro de que quieres borrar esta tarea? Esta acción no se puede deshacer.</p>
+                <input type="hidden" id="deleteTaskId"> <div class="modal-buttons">
+                    <button id="btnConfirmDelete" class="btn-logout">Sí, eliminar</button>
+                    <button id="btnCancelDelete" style="background-color: #6c757d; color: white;">Cancelar</button>
+                </div>
+            </div>
+        </div>
         
         
        
@@ -128,8 +139,10 @@
                                         <h3>${tarea.title}</h3>
                                         <p>${tarea.description || 'Sin descripción'}</p>
                                 </div>
+                    
                                 <div class="task-actions">
                                     <button class="btn-edit" onclick="editarTarea(${tarea.id}, '${tarea.title}', '${tarea.description || ''}')">Editar</button>
+                                    <button class="btn-logout" onclick="eliminarTarea(${tarea.id})">Borrar</button>
                                 </div>
                             `;
                             taskList.appendChild(li);
@@ -199,6 +212,53 @@
 
                 }
             })
+
+            const deleteModal = document.getElementById("deleteModal")
+            const deleteTaskId = document.getElementById("deleteTaskId")
+
+            const eliminarTarea = (id) =>{
+                deleteTaskId.value = id
+                deleteModal.classList.add("active")
+
+
+            };
+
+            document.getElementById("btnCancelDelete").addEventListener("click",() =>{
+                deleteModal.classList.remove("active")
+            })
+
+            document.getElementById("btnConfirmDelete").addEventListener("click",async () => {
+                const id = deleteTaskId.value
+
+
+                try{
+
+                    const response = await fetch (`http://localhost:3000/api/task/${id}`,{
+                        method : "DELETE",
+                        headers:{
+                            "Authorization": `Bearer ${token}`
+                        }
+                    })
+
+                    if (response.ok){
+                        deleteModal.classList.remove("active")
+                        cargarTareas()
+                    }else{
+                        const data = await response.json()
+                        alert("Error al eliminar: " +  data.message)
+            
+                    }
+
+
+                }catch(error){
+                    console.error("Error al eliminar: ", error)
+                    alert("Error de conexion al intentar borrar.")
+
+                }
+            })
+
+
+
 
 
 
